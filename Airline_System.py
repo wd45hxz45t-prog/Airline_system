@@ -380,5 +380,12 @@ class BookingSystem:
                 print("  Invalid choice! Please enter a number between 1 and 7.")
 
 
+# === RUN THE PROGRAM ===
+# Create a BookingSystem object and run it
+if __name__ == "__main__":
+    system = BookingSystem()
+    system.run()
+
+
 
 
