@@ -6,7 +6,7 @@
 # Import built-in library needed for generating miles calculations
 # random: used for any random operations if needed in future
 import random
-
+import string 
 
 # === CLASS 1: AIRCRAFT ===
 # This class is responsible for creating and managing the aircraft seat map.
@@ -118,9 +118,26 @@ class Booking:
     def __init__(self, aircraft):
         # Store a reference to the Aircraft object to access the seat map
         self.aircraft = aircraft
+        
+       # In-memory database: stores passenger details for each booking
+        # Key = booking reference, Value = passenger details dictionary
+        # Example: self.db["A3BX92KL"] = {first_name, last_name, passport, row, col}
+        self.db = {}
+        
+        
+        
+    def generate_reference(self):
+        # Keep generating random 8-character references until a unique one is found
+        # Characters are picked from A-Z and 0-9
+        while True:
+            reference = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+            # Only return the reference if it does not already exist in the database
+            if reference not in self.db:
+                return reference
 
     def book_seat(self):
-        # Book a seat by storing "R" in the seat map
+        # Book a seat by storing a unique reference and saving passenger data
         print("\n-- Book a Seat --")
 
         try:
@@ -141,49 +158,74 @@ class Booking:
 
         seat_status = self.aircraft.plane[row - 1][col_index]
 
-        # Only book the seat if it is currently free
-        if seat_status == "F":
-            self.aircraft.plane[row - 1][col_index] = "R"
-            print(f"  Seat {row}{col} has been successfully BOOKED!")
-        elif seat_status == "R":
-            print(f"  Seat {row}{col} is already reserved. Please choose another seat.")
-        elif seat_status == "S":
-            print(f"  Seat {row}{col} is a storage area. Cannot be booked.")
-        else:
-            print(f"  Seat {row}{col} is an aisle. Cannot be booked.")
+        # Only book if seat is free
+        if seat_status != "F":
+            print(f"  Seat {row}{col} is not available.")
+            return
+
+        # Collect passenger details
+        first_name = input("  Enter passenger first name: ")
+        last_name  = input("  Enter passenger last name: ")
+        passport   = input("  Enter passport number: ")
+
+        # Generate a unique 8-character booking reference
+        reference = self.generate_reference()
+
+        # Store the reference in the seat map instead of just "R"
+        self.aircraft.plane[row - 1][col_index] = reference
+
+        # Save passenger data to the database
+        self.db[reference] = {
+            "first_name": first_name,
+            "last_name":  last_name,
+            "passport":   passport,
+            "row":        row,
+            "col":        col
+        }
+
+        print("\n  Booking confirmed!")
+        print(f"  Seat: {row}{col}")
+        print(f"  Passenger: {first_name} {last_name}")
+        print(f"  Booking Reference: {reference}")
+
 
     def free_seat(self):
-        # Free a reserved seat by storing "F" back in the seat map
-        print("\n-- Free a Seat --")
+          # Free a reserved seat by storing "F" back in the seat map
+          print("\n-- Free a Seat --")
 
-        try:
-            row = int(input("  Enter row number (1-80): "))
-            if row < 1 or row > 80:
-                print("  Invalid row! Please enter a number between 1 and 80.")
-                return
-        except ValueError:
-            print("  Invalid input! Please enter a number.")
-            return
+          try:
+              row = int(input("  Enter row number (1-80): "))
+              if row < 1 or row > 80:
+                  print("  Invalid row! Please enter a number between 1 and 80.")
+                  return
+          except ValueError:
+              print("  Invalid input! Please enter a number.")
+              return
 
-        col = input("  Enter column letter (A, B, C, D, E, F): ").upper()
-        col_index = self.aircraft.get_column_index(col)
+          col = input("  Enter column letter (A, B, C, D, E, F): ").upper()
+          col_index = self.aircraft.get_column_index(col)
 
-        if col_index == -1:
-            print("  Invalid column! Please enter A, B, C, D, E, or F.")
-            return
+          if col_index == -1:
+              print("  Invalid column! Please enter A, B, C, D, E, or F.")
+              return
 
-        seat_status = self.aircraft.plane[row - 1][col_index]
+          seat_status = self.aircraft.plane[row - 1][col_index]
 
-        # Only free the seat if it is currently reserved
-        if seat_status == "R":
-            self.aircraft.plane[row - 1][col_index] = "F"
-            print(f"  Seat {row}{col} has been successfully FREED!")
-        elif seat_status == "F":
-            print(f"  Seat {row}{col} is already free. Nothing to cancel.")
-        elif seat_status == "S":
-            print(f"  Seat {row}{col} is a storage area.")
-        else:
-            print(f"  Seat {row}{col} is an aisle.")
+          # Only free the seat if it is currently reserved
+          if seat_status == "R":
+              self.aircraft.plane[row - 1][col_index] = "F"
+              print(f"  Seat {row}{col} has been successfully FREED!")
+          elif seat_status == "F":
+              print(f"  Seat {row}{col} is already free. Nothing to cancel.")
+          elif seat_status == "S":
+              print(f"  Seat {row}{col} is a storage area.")
+          else:
+              print(f"  Seat {row}{col} is an aisle.")
+              
+              
+              print(f"  Seat {row}{col} is an aisle.")
+            
+            
             
             
             
