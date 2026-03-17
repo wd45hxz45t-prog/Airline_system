@@ -105,4 +105,85 @@ class Aircraft:
             print(f"  Seat {row}{col} is an AISLE. Cannot be booked.")
         else:
             print(f"  Seat {row}{col} is already RESERVED.")
+            
+            
+    
+
+# === CLASS 2: BOOKING ===
+# This class handles all booking operations including booking and freeing seats.
+# It stores "R" in the seat map when a seat is booked.
+
+class Booking:
+
+    def __init__(self, aircraft):
+        # Store a reference to the Aircraft object to access the seat map
+        self.aircraft = aircraft
+
+    def book_seat(self):
+        # Book a seat by storing "R" in the seat map
+        print("\n-- Book a Seat --")
+
+        try:
+            row = int(input("  Enter row number (1-80): "))
+            if row < 1 or row > 80:
+                print("  Invalid row! Please enter a number between 1 and 80.")
+                return
+        except ValueError:
+            print("  Invalid input! Please enter a number.")
+            return
+
+        col = input("  Enter column letter (A, B, C, D, E, F): ").upper()
+        col_index = self.aircraft.get_column_index(col)
+
+        if col_index == -1:
+            print("  Invalid column! Please enter A, B, C, D, E, or F.")
+            return
+
+        seat_status = self.aircraft.plane[row - 1][col_index]
+
+        # Only book the seat if it is currently free
+        if seat_status == "F":
+            self.aircraft.plane[row - 1][col_index] = "R"
+            print(f"  Seat {row}{col} has been successfully BOOKED!")
+        elif seat_status == "R":
+            print(f"  Seat {row}{col} is already reserved. Please choose another seat.")
+        elif seat_status == "S":
+            print(f"  Seat {row}{col} is a storage area. Cannot be booked.")
+        else:
+            print(f"  Seat {row}{col} is an aisle. Cannot be booked.")
+
+    def free_seat(self):
+        # Free a reserved seat by storing "F" back in the seat map
+        print("\n-- Free a Seat --")
+
+        try:
+            row = int(input("  Enter row number (1-80): "))
+            if row < 1 or row > 80:
+                print("  Invalid row! Please enter a number between 1 and 80.")
+                return
+        except ValueError:
+            print("  Invalid input! Please enter a number.")
+            return
+
+        col = input("  Enter column letter (A, B, C, D, E, F): ").upper()
+        col_index = self.aircraft.get_column_index(col)
+
+        if col_index == -1:
+            print("  Invalid column! Please enter A, B, C, D, E, or F.")
+            return
+
+        seat_status = self.aircraft.plane[row - 1][col_index]
+
+        # Only free the seat if it is currently reserved
+        if seat_status == "R":
+            self.aircraft.plane[row - 1][col_index] = "F"
+            print(f"  Seat {row}{col} has been successfully FREED!")
+        elif seat_status == "F":
+            print(f"  Seat {row}{col} is already free. Nothing to cancel.")
+        elif seat_status == "S":
+            print(f"  Seat {row}{col} is a storage area.")
+        else:
+            print(f"  Seat {row}{col} is an aisle.")
+
+
 
