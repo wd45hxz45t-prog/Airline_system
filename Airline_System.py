@@ -184,6 +184,148 @@ class Booking:
             print(f"  Seat {row}{col} is a storage area.")
         else:
             print(f"  Seat {row}{col} is an aisle.")
+            
+            
+            
+            
+
+# === CLASS 3: MILES ===
+# This class handles the miles balance for each passenger and seat upgrades.
+# Economy seats (D, E, F) can be upgraded to Business (A, B, C) for 5000 miles.
+
+class Miles:
+
+    def __init__(self, aircraft):
+        # Store a reference to the Aircraft object to access the seat map
+        self.aircraft = aircraft
+
+        # Dictionary to store miles balance for each booked seat
+        # Key = seat key (e.g. "5D"), Value = miles balance (integer)
+        self.miles_balance = {}
+
+    def add_miles(self):
+        # Add miles to a booked seat's balance
+        print("\n-- Add Miles to Your Account --")
+
+        try:
+            row = int(input("  Enter your seat row (1-80): "))
+            if row < 1 or row > 80:
+                print("  Invalid row!")
+                return
+        except ValueError:
+            print("  Invalid input!")
+            return
+
+        col = input("  Enter your seat column (A, B, C, D, E, F): ").upper()
+        col_index = self.aircraft.get_column_index(col)
+
+        if col_index == -1:
+            print("  Invalid column!")
+            return
+
+        # Seat must be reserved before adding miles
+        if self.aircraft.plane[row - 1][col_index] != "R":
+            print(f"  Seat {row}{col} is not reserved. Please book it first.")
+            return
+
+        try:
+            miles_to_add = int(input("  Enter miles to add: "))
+            if miles_to_add <= 0:
+                print("  Miles must be a positive number.")
+                return
+        except ValueError:
+            print("  Invalid input!")
+            return
+
+        # Add miles to this seat's balance
+        # If seat has no record yet, start from 0
+        seat_key = f"{row}{col}"
+        if seat_key not in self.miles_balance:
+            self.miles_balance[seat_key] = 0
+
+        self.miles_balance[seat_key] += miles_to_add
+        print(f"  {miles_to_add} miles added.")
+        print(f"  Total miles balance: {self.miles_balance[seat_key]} miles")
+
+    def upgrade_seat(self):
+        # Upgrade a seat from Economy (D,E,F) to Business (A,B,C) for 5000 miles
+        print("\n-- Seat Upgrade Using Miles --")
+        print("  Economy (D,E,F) to Business (A,B,C) costs 5000 miles")
+
+        try:
+            current_row = int(input("\n  Enter your current seat row (1-80): "))
+            if current_row < 1 or current_row > 80:
+                print("  Invalid row!")
+                return
+        except ValueError:
+            print("  Invalid input!")
+            return
+
+        current_col = input("  Enter your current seat column (D, E, F): ").upper()
+
+        # Only Economy seats (D, E, F) can be upgraded
+        if current_col not in ["D", "E", "F"]:
+            print("  Upgrades are only available from Economy seats (D, E, F).")
+            return
+
+        current_col_index = self.aircraft.get_column_index(current_col)
+
+        # Make sure the current seat is reserved
+        if self.aircraft.plane[current_row - 1][current_col_index] != "R":
+            print(f"  Seat {current_row}{current_col} is not reserved.")
+            return
+
+        # Check miles balance for this seat
+        seat_key = f"{current_row}{current_col}"
+        if seat_key not in self.miles_balance:
+            self.miles_balance[seat_key] = 0
+
+        current_miles = self.miles_balance[seat_key]
+        print(f"\n  Your current miles balance: {current_miles} miles")
+
+        # Check if the user has enough miles
+        if current_miles < 5000:
+            print(f"  Not enough miles! You need {5000 - current_miles} more miles.")
+            return
+
+        try:
+            new_row = int(input("\n  Enter preferred Business seat row (1-80): "))
+            if new_row < 1 or new_row > 80:
+                print("  Invalid row!")
+                return
+        except ValueError:
+            print("  Invalid input!")
+            return
+
+        new_col = input("  Enter preferred Business seat column (A, B, C): ").upper()
+
+        # New seat must be Business class (A, B, or C)
+        if new_col not in ["A", "B", "C"]:
+            print("  Please choose a Business class seat (A, B, or C).")
+            return
+
+        new_col_index = self.aircraft.get_column_index(new_col)
+
+        # New Business seat must be free
+        if self.aircraft.plane[new_row - 1][new_col_index] != "F":
+            print(f"  Seat {new_row}{new_col} is not available.")
+            return
+
+        # Free the old Economy seat and book the new Business seat
+        self.aircraft.plane[current_row - 1][current_col_index] = "F"
+        self.aircraft.plane[new_row - 1][new_col_index] = "R"
+
+        # Deduct 5000 miles and transfer remaining balance to the new seat key
+        self.miles_balance[seat_key] = current_miles - 5000
+        new_seat_key = f"{new_row}{new_col}"
+        self.miles_balance[new_seat_key] = self.miles_balance[seat_key]
+        del self.miles_balance[seat_key]
+
+        print(f"\n  Upgrade successful!")
+        print(f"  Moved from Economy {current_row}{current_col} to Business {new_row}{new_col}")
+        print(f"  Remaining miles: {self.miles_balance[new_seat_key]}")
+
+
 
 
 
