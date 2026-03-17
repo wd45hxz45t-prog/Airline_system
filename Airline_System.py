@@ -321,10 +321,63 @@ class Miles:
         self.miles_balance[new_seat_key] = self.miles_balance[seat_key]
         del self.miles_balance[seat_key]
 
-        print(f"\n  Upgrade successful!")
+        print("\n  Upgrade successful!")
         print(f"  Moved from Economy {current_row}{current_col} to Business {new_row}{new_col}")
         print(f"  Remaining miles: {self.miles_balance[new_seat_key]}")
 
+
+
+
+
+# === CLASS 4: BOOKING SYSTEM ===
+# This is the main class that ties everything together.
+# It creates instances of all other classes and runs the main menu loop.
+
+class BookingSystem:
+
+    def __init__(self):
+        # Create instances of all classes
+        # Aircraft must be created first as Booking and Miles depend on it
+        self.aircraft = Aircraft()
+        self.booking  = Booking(self.aircraft)
+        self.miles    = Miles(self.aircraft)
+
+    def run(self):
+        # Run the main menu loop until the user chooses to exit
+        print("\n  Welcome to Apache Airlines Booking System")
+
+        while True:
+            print("\n" + "=" * 40)
+            print("         MAIN MENU")
+            print("=" * 40)
+            print("  1. Check seat availability")
+            print("  2. Book a seat")
+            print("  3. Free a seat")
+            print("  4. Show full seat map")
+            print("  5. Upgrade seat using miles")
+            print("  6. Add miles to your account")
+            print("  7. Exit program")
+            print("=" * 40)
+
+            choice = input("  Enter your choice (1-7): ")
+
+            if choice == "1":
+                self.aircraft.check_seat()
+            elif choice == "2":
+                self.booking.book_seat()
+            elif choice == "3":
+                self.booking.free_seat()
+            elif choice == "4":
+                self.aircraft.show_seat_map()
+            elif choice == "5":
+                self.miles.upgrade_seat()
+            elif choice == "6":
+                self.miles.add_miles()
+            elif choice == "7":
+                print("\n  Thank you for using Apache Airlines. Goodbye!\n")
+                break
+            else:
+                print("  Invalid choice! Please enter a number between 1 and 7.")
 
 
 
